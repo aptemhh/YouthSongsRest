@@ -13,11 +13,15 @@
     <!-- Imported bean for dao -->
     <import resource="classpath:META-INF/spring/dao.xml"/>
 
-    <bean id="customersService" class="ru.rest.youth.songs.youthsongs.CustomersServiceJSON"/>
+    <bean id="restService" class="ru.rest.youth.songs.RestService"/>
+    <bean id="globalExceptionMapper" class="ru.rest.youth.songs.exception.GlobalExceptionMapper"/>
 
-    <jaxrs:server id="restContainer" address="/customer">
+    <jaxrs:server id="restContainer" address="/rest">
         <jaxrs:serviceBeans>
-            <ref bean="customersService"/>
+            <ref bean="restService"/>
         </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="globalExceptionMapper" />
+        </jaxrs:providers>
     </jaxrs:server>
 </beans>
