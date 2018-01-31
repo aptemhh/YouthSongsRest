@@ -6,8 +6,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.rest.youth.songs.data.JdbcSongDAO;
 import ru.rest.youth.songs.json.JsonConverter;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.*;
 
 public class RestService  {
 
@@ -34,11 +38,22 @@ public class RestService  {
 
     @GET
     @Path("/upload")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String uploadXml() {
+    @Produces(MediaType.TEXT_HTML)
+    public Response uploadXml() {
         if (uploadOnline) {
             //#TODO релизовать загрузку через xml файл
         }
-        return "" + uploadOnline;
+
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/download")
+    @Produces(MediaType.TEXT_HTML)
+    public Response downloadXml(@Context HttpServletResponse response) throws IOException {
+        Response.ResponseBuilder builder = Response.ok();
+        jdbcSongDAO.getXmlAllSongs(response.getOutputStream());
+        builder.header("Content-Disposition", "attachment; filename=qwe.xml" );
+        return builder.build();
     }
 }

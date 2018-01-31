@@ -1,18 +1,26 @@
 package ru.rest.youth.songs.data;
 
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class Song {
     Integer number;
-    String text;
+
+    @XmlElement
     String description;
+    @XmlElement
+    String text;
 
     public Song(Integer number, String description, String text) {
         this.number = number;
-        this.text = text;
         this.description = description;
+        this.text = text;
     }
 
+    public Song()
+    {}
 
     public Integer getNumber() {
         return number;
