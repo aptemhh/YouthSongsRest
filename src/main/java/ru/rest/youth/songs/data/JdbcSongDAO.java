@@ -42,31 +42,36 @@ public class JdbcSongDAO {
         return null;
     }
 
-    public List<Song> findSongByText(String text) {
-        //#TODO релизовать поиск песен по тексту
-        List<Song> songs = new ArrayList<>();
-        songs.add(findBySongNumber(1));
-        songs.add(findBySongNumber(1));
-        return songs;
-    }
-
     public void getXmlAllSongs(ServletOutputStream printWriter) {
 
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Songs.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.marshal(new Songs().setSongs(getSongList()), printWriter);
+            jaxbMarshaller.marshal(new Songs().setSongs(getSongList(null)), printWriter);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
     }
 
-    public List<Song> getSongList() {
-
-        String sql = "SELECT ID,DESCRIPTION,TEXT FROM SONG ORDER by ID";
+    public List<Song> getSongList(String text) {
+        //#todo сделать поиск по номеру
         List<Song> songList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
+            String sql;
+            if(text == null)
+            {
+                sql = "SELECT ID,DESCRIPTION,TEXT " +
+                        "FROM SONG " +
+                        "ORDER by ID";
+            }
+            else {
+                sql = "SELECT ID,DESCRIPTION,TEXT " +
+                        "FROM SONG " +
+                        "where DESCRIPTION like '%" + text + "%' " +
+                        "OR TEXT like'%" + text + "%' " +
+                        "ORDER by ID";
+            }
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     for (; rs.next(); ) {

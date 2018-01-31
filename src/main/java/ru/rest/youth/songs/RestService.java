@@ -33,7 +33,8 @@ public class RestService  {
     @Path("/find/{text}")
     @Produces(MediaType.APPLICATION_JSON)
     public String findSongs(@PathParam("text") String text) {
-        return JsonConverter.convert(jdbcSongDAO.findSongByText("2"));
+        //#todo запилить валидацию
+        return JsonConverter.convert(jdbcSongDAO.getSongList(text));
     }
 
     @GET
