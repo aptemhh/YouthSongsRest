@@ -2,17 +2,13 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jaxrs="http://cxf.apache.org/jaxrs"
        xmlns="http://www.springframework.org/schema/beans"
+       xmlns:cache="http://www.springframework.org/schema/cache"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-
-        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
-
-    <!-- Imported resources for cxf -->
-    <import resource="classpath:META-INF/cxf/cxf.xml"/>
-    <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml"/>
-    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
-
-    <!-- Imported bean for dao -->
+       http://www.springframework.org/schema/cache
+       http://www.springframework.org/schema/cache/spring-cache.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <cache:annotation-driven />
     <import resource="classpath:META-INF/spring/dao.xml"/>
 
     <bean id="restService" class="ru.rest.youth.songs.RestService"/>
@@ -26,4 +22,14 @@
             <ref bean="globalExceptionMapper" />
         </jaxrs:providers>
     </jaxrs:server>
+
+    <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+        <property name="caches">
+            <set>
+                <bean
+                        class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+                        name="employee"/>
+            </set>
+        </property>
+    </bean>
 </beans>

@@ -1,6 +1,8 @@
 package ru.rest.youth.songs;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.rest.youth.songs.data.JdbcSongDAO;
@@ -25,7 +27,7 @@ public class RestService  {
     @GET
     @Path("/number/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-//    @Cacheable(value = "employee", key = "#id")
+    @Cacheable(value = "employee", key = "#id")
     public String getSong(@PathParam("id") Integer id) {
         return JsonConverter.convert(jdbcSongDAO.findBySongNumber(id));
     }
@@ -33,7 +35,7 @@ public class RestService  {
     @GET
     @Path("/find/{text}")
     @Produces(MediaType.APPLICATION_JSON)
-//    @Cacheable(value = "employee", key = "#text")
+    @Cacheable(value = "employee", key = "#text")
     public String findSongs(@PathParam("text") String text) {
         return JsonConverter.convert(jdbcSongDAO.getSongListShort(text));
     }
@@ -41,7 +43,7 @@ public class RestService  {
     @GET
     @Path("/find/")
     @Produces(MediaType.APPLICATION_JSON)
-//    @Cacheable(value = "employee")
+    @Cacheable(value = "employee")
     public String findSongs() {
         return JsonConverter.convert(jdbcSongDAO.getSongListShort(null));
     }
@@ -50,7 +52,7 @@ public class RestService  {
     @GET
     @Path("/upload")
     @Produces(MediaType.TEXT_HTML)
-//    @CacheEvict(value = "employee")
+    @CacheEvict(value = "employee")
     public Response uploadXml() {
         if (uploadOnline) {
             //#TODO релизовать загрузку через xml файл
@@ -61,7 +63,7 @@ public class RestService  {
 
     @GET
     @Path("/download")
-//    @Cacheable(value = "employee")
+    @Cacheable(value = "employee")
     @Produces(MediaType.TEXT_HTML)
     public Response downloadXml(@Context HttpServletResponse response) throws IOException {
         Response.ResponseBuilder builder = Response.ok();
