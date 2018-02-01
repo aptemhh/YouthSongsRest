@@ -25,6 +25,7 @@ public class RestService  {
     @GET
     @Path("/number/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+//    @Cacheable(value = "employee", key = "#id")
     public String getSong(@PathParam("id") Integer id) {
         return JsonConverter.convert(jdbcSongDAO.findBySongNumber(id));
     }
@@ -32,14 +33,24 @@ public class RestService  {
     @GET
     @Path("/find/{text}")
     @Produces(MediaType.APPLICATION_JSON)
+//    @Cacheable(value = "employee", key = "#text")
     public String findSongs(@PathParam("text") String text) {
-        //#todo запилить валидацию
-        return JsonConverter.convert(jdbcSongDAO.getSongList(text));
+        return JsonConverter.convert(jdbcSongDAO.getSongListShort(text));
     }
+
+    @GET
+    @Path("/find/")
+    @Produces(MediaType.APPLICATION_JSON)
+//    @Cacheable(value = "employee")
+    public String findSongs() {
+        return JsonConverter.convert(jdbcSongDAO.getSongListShort(null));
+    }
+
 
     @GET
     @Path("/upload")
     @Produces(MediaType.TEXT_HTML)
+//    @CacheEvict(value = "employee")
     public Response uploadXml() {
         if (uploadOnline) {
             //#TODO релизовать загрузку через xml файл
@@ -50,6 +61,7 @@ public class RestService  {
 
     @GET
     @Path("/download")
+//    @Cacheable(value = "employee")
     @Produces(MediaType.TEXT_HTML)
     public Response downloadXml(@Context HttpServletResponse response) throws IOException {
         Response.ResponseBuilder builder = Response.ok();

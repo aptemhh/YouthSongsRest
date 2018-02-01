@@ -10,19 +10,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class JdbcSongDAO {
 
-
     private DataSource dataSource;
+    private static final String GET_SING_LIST = "SELECT ID,DESCRIPTION,TEXT " +
+            "FROM SONG " +
+            "ORDER BY ID";
+    private static final String GET_SING_LIST_SHORT = "SELECT ID,DESCRIPTION " +
+            "FROM SONG " +
+            "ORDER BY ID";
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public Song findBySongNumber(int number) {
-
         String sql = "SELECT ID,DESCRIPTION,TEXT FROM SONG WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection()) {
@@ -38,41 +43,27 @@ public class JdbcSongDAO {
                     }
                 }
             }
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     public void getXmlAllSongs(ServletOutputStream printWriter) {
-
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Songs.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.marshal(new Songs().setSongs(getSongList(null)), printWriter);
+            jaxbMarshaller.marshal(new Songs().setSongs(getSongList()), printWriter);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
     }
 
-    public List<Song> getSongList(String text) {
-        //#todo сделать поиск по номеру
+    public List<Song> getSongList() {
         List<Song> songList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
-            String sql;
-            if(text == null)
-            {
-                sql = "SELECT ID,DESCRIPTION,TEXT " +
-                        "FROM SONG " +
-                        "ORDER by ID";
-            }
-            else {
-                sql = "SELECT ID,DESCRIPTION,TEXT " +
-                        "FROM SONG " +
-                        "where DESCRIPTION like '%" + text + "%' " +
-                        "OR TEXT like'%" + text + "%' " +
-                        "ORDER by ID";
-            }
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (PreparedStatement ps = conn.prepareStatement(GET_SING_LIST)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     for (; rs.next(); ) {
                         songList.add(new Song(rs.getInt("ID"),
@@ -84,6 +75,39 @@ public class JdbcSongDAO {
             return songList;
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public List<Song> getSongListShort(String text) {
+        try {
+            return Collections.singletonList(findBySongNumber(Integer.parseInt(text)));
+        }
+        catch (NumberFormatException e) {
+            //#todo запилить валидацию
+            List<Song> songList = new ArrayList<>();
+            try (Connection conn = dataSource.getConnection()) {
+                String sql;
+                if (text == null) {
+                    sql = GET_SING_LIST_SHORT;
+                } else {
+                    sql = "SELECT ID,DESCRIPTION " +
+                            "FROM SONG " +
+                            "where DESCRIPTION like '%" + text + "%' " +
+                            "OR TEXT like'%" + text + "%' " +
+                            "ORDER by ID";
+                }
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    try (ResultSet rs = ps.executeQuery()) {
+                        for (; rs.next(); ) {
+                            songList.add(new Song(rs.getInt("ID"),
+                                    rs.getString("DESCRIPTION")));
+                        }
+                    }
+                }
+                return songList;
+            } catch (SQLException e1) {
+                throw new RuntimeException(e1);
+            }
         }
     }
 }

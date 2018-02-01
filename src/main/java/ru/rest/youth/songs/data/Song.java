@@ -19,6 +19,11 @@ public class Song {
         this.text = text;
     }
 
+    public Song(Integer number, String description) {
+        this.number = number;
+        this.description = description;
+    }
+
     public Song()
     {}
 

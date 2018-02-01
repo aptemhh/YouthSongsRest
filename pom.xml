@@ -101,20 +101,6 @@
 					<warFile>${project.basedir}/target/service.war</warFile>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-ear-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-                    <excludes>
-                        D:/YouthSongsRest/src/db
-                    </excludes>
-					<modules>
-						<ejbModule>
-							<!-- property configurations goes here -->
-						</ejbModule>
-					</modules>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 
