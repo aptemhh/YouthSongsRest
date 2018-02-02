@@ -5,6 +5,8 @@ import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +14,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JdbcSongDAO {
 
@@ -108,6 +113,54 @@ public class JdbcSongDAO {
             } catch (SQLException e1) {
                 throw new RuntimeException(e1);
             }
+        }
+    }
+
+    public void load()
+    {
+        File file = new File("E:\\Novy_textovy_dokument.txt");
+        Pattern pattern = Pattern.compile("\\d+\\.(.+)");
+        try {
+            Scanner scanner = new Scanner(file);
+            StringBuilder stringBuilder = new StringBuilder();
+            String name = "";
+            Boolean aBoolean=false;
+           for(; scanner.hasNextLine();) {
+               String s = scanner.nextLine();
+               if (pattern.matcher(s).matches()) {
+                   if (aBoolean) {
+                       add(name, stringBuilder.toString());
+                   }
+
+
+                   stringBuilder = new StringBuilder();
+                   Matcher matcher = pattern.matcher(s);
+                   matcher.find();
+                   name = matcher.group(1);
+                   aBoolean = true;
+                   stringBuilder.append(name);
+                   continue;
+               }
+               stringBuilder.append("\n");
+               stringBuilder.append(s);
+           }
+           add(name, stringBuilder.toString());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void add(String desc, String text)
+    {
+        try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO SONG VALUES (null,?,?)")) {
+                ps.setString(1, desc);
+                ps.setString(2, text);
+                ps.execute();
+                ps.close();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

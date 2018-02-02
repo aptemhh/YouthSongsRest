@@ -24,6 +24,11 @@ public class Song {
         this.description = description;
     }
 
+    public Song(String description, String text) {
+        this.description = description;
+        this.text = text;
+    }
+
     public Song()
     {}
 

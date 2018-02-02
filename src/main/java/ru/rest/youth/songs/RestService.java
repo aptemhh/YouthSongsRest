@@ -57,7 +57,7 @@ public class RestService  {
         if (uploadOnline) {
             //#TODO релизовать загрузку через xml файл
         }
-
+        jdbcSongDAO.load();
         return Response.ok().build();
     }
 
