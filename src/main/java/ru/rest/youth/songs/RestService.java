@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
 
-public class RestService  {
+public class RestService {
 
     private static ApplicationContext context =
             new ClassPathXmlApplicationContext("META-INF/spring/dao.xml");
@@ -26,8 +26,8 @@ public class RestService  {
     private Boolean uploadOnline;
 
     @GET
-    @Path("/number/{id}"+ ";charset=utf-8")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/number/{id}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#id")
     public String getSong(@PathParam("id") Integer id) {
         return JsonConverter.convert(jdbcSongDAO.findBySongNumber(id));
@@ -35,7 +35,7 @@ public class RestService  {
 
     @GET
     @Path("/find/{text}")
-    @Produces(MediaType.APPLICATION_JSON+ ";charset=utf-8")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#text")
     public String findSongs(@PathParam("text") String text) {
         return JsonConverter.convert(jdbcSongDAO.getSongListShort(text));
@@ -43,7 +43,7 @@ public class RestService  {
 
     @GET
     @Path("/find/")
-    @Produces(MediaType.APPLICATION_JSON+ ";charset=utf-8")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee")
     public String findSongs() {
         return JsonConverter.convert(jdbcSongDAO.getSongListShort(null));
@@ -65,8 +65,8 @@ public class RestService  {
 
     @GET
     @Path("/upload")
-    @Produces(MediaType.APPLICATION_JSON+ ";charset=utf-8")
-    @Consumes(MediaType.APPLICATION_JSON+ ";charset=utf-8")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @CacheEvict(value = "employee")
     public Response upload(Song song) {
         if (uploadOnline) {
@@ -77,13 +77,13 @@ public class RestService  {
     }
 
     @GET
-    @Path("/download"+ ";charset=utf-8")
+    @Path("/download")
     @Cacheable(value = "employee")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.TEXT_HTML+ ";charset=utf-8")
     public Response downloadXml(@Context HttpServletResponse response) throws IOException {
         Response.ResponseBuilder builder = Response.ok();
         jdbcSongDAO.getXmlAllSongs(response.getOutputStream());
-        builder.header("Content-Disposition", "attachment; filename=qwe.xml" );
+        builder.header("Content-Disposition", "attachment; filename=qwe.xml");
         return builder.build();
     }
 }
