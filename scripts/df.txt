@@ -1,5 +1,6 @@
+u0463889_person
+ikfcfifgjijcctbcjcfkfceire542
+
+
 database.driverClassName=com.mysql.jdbc.Driver
 database.url=jdbc:mysql://localhost:3306/u0463889_default?characterEncoding=UTF-8
-database.username=u0463889_person
-database.password=ikfcfifgjijcctbcjcfkfceire542
-uploadOnline=false
