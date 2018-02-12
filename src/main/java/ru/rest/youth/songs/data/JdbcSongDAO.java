@@ -97,11 +97,14 @@ public class JdbcSongDAO {
                 } else {
                     sql = "SELECT ID,DESCRIPTION " +
                             "FROM SONG " +
-                            "where DESCRIPTION like '%" + text + "%' " +
-                            "OR TEXT like'%" + text + "%' " +
+                            "where DESCRIPTION like ? " +
+                            "OR TEXT like ? " +
                             "ORDER by ID";
                 }
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    String parameter = "'%" + text + "%'";
+                    ps.setString(1, parameter);
+                    ps.setString(2, parameter);
                     try (ResultSet rs = ps.executeQuery()) {
                         for (; rs.next(); ) {
                             songList.add(new Song(rs.getInt("ID"),
