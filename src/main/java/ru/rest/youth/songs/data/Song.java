@@ -45,5 +45,9 @@ public class Song {
     public String getDescription() {
         return description;
     }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 }
 

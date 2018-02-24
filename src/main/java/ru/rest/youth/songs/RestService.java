@@ -56,8 +56,7 @@ public class RestService {
     @CacheEvict(value = "employee")
     public Response uploadXml() {
         if (uploadOnline) {
-            jdbcSongDAO.load();
-            //#TODO релизовать загрузку через xml файл
+
         }
 
         return Response.ok().build();

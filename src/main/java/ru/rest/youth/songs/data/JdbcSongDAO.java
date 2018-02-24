@@ -49,7 +49,8 @@ public class JdbcSongDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            errorSong.setText(e.getMessage());
+            return errorSong;
         }
         return null;
     }
@@ -79,7 +80,8 @@ public class JdbcSongDAO {
             }
             return songList;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            errorSong.setText(e.getMessage());
+            return Collections.singletonList(errorSong);
         }
     }
 
@@ -88,7 +90,6 @@ public class JdbcSongDAO {
             return Collections.singletonList(findBySongNumber(Integer.parseInt(text)));
         }
         catch (NumberFormatException e) {
-            //#todo запилить валидацию
             List<Song> songList = new ArrayList<>();
             try (Connection conn = dataSource.getConnection()) {
                 String sql;
@@ -102,9 +103,13 @@ public class JdbcSongDAO {
                             "ORDER by ID";
                 }
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                    String parameter = "'%" + text + "%'";
-                    ps.setString(1, parameter);
-                    ps.setString(2, parameter);
+                    if (text != null)
+                    {
+                        String parameter = "%" + text + "%";
+                        ps.setString(1, parameter);
+                        ps.setString(2, parameter);
+                    }
+
                     try (ResultSet rs = ps.executeQuery()) {
                         for (; rs.next(); ) {
                             songList.add(new Song(rs.getInt("ID"),
@@ -114,11 +119,13 @@ public class JdbcSongDAO {
                 }
                 return songList;
             } catch (SQLException e1) {
-                throw new RuntimeException(e1);
+                errorSong.setText(e1.getMessage());
+                return Collections.singletonList(errorSong);
             }
         }
     }
 
+    @Deprecated
     public void load()
     {
         File file = new File("E:\\Novy_textovy_dokument.txt");
@@ -166,4 +173,6 @@ public class JdbcSongDAO {
             throw new RuntimeException(e);
         }
     }
+
+    private Song errorSong = new Song("Произошла ошибка","");
 }
