@@ -32,7 +32,7 @@ public class JdbcSongDAO {
         this.dataSource = dataSource;
     }
 
-    public Song findBySongNumber(int number) {
+    public Song findBySongNumber(int number) throws SQLException {
         String sql = "SELECT ID,DESCRIPTION,TEXT FROM SONG WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection()) {
@@ -48,24 +48,18 @@ public class JdbcSongDAO {
                     }
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return null;
     }
 
-    public void getXmlAllSongs(ServletOutputStream printWriter) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Songs.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.marshal(new Songs().setSongs(getSongList()), printWriter);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
+    public void getXmlAllSongs(ServletOutputStream printWriter) throws JAXBException, SQLException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(Songs.class);
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        jaxbMarshaller.marshal(new Songs().setSongs(getSongList()), printWriter);
     }
 
-    public List<Song> getSongList() {
+    public List<Song> getSongList() throws SQLException {
         List<Song> songList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(GET_SING_LIST)) {
@@ -78,12 +72,10 @@ public class JdbcSongDAO {
                 }
             }
             return songList;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    public List<Song> getSongListShort(String text) {
+    public List<Song> getSongListShort(String text) throws SQLException {
         try {
             return Collections.singletonList(findBySongNumber(Integer.parseInt(text)));
         }
@@ -96,13 +88,12 @@ public class JdbcSongDAO {
                 } else {
                     sql = "SELECT ID,DESCRIPTION " +
                             "FROM SONG " +
-                            "where DESCRIPTION like ? " +
-                            "OR TEXT like ? " +
-                            "ORDER by ID";
+                            "WHERE DESCRIPTION LIKE ? " +
+                            "OR TEXT LIKE ? " +
+                            "ORDER BY ID";
                 }
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                    if (text != null)
-                    {
+                    if (text != null) {
                         String parameter = "%" + text + "%";
                         ps.setString(1, parameter);
                         ps.setString(2, parameter);
@@ -116,15 +107,12 @@ public class JdbcSongDAO {
                     }
                 }
                 return songList;
-            } catch (SQLException e1) {
-                throw new RuntimeException(e1);
             }
         }
     }
 
     @Deprecated
-    public void load()
-    {
+    public void load() throws SQLException {
         File file = new File("E:\\Novy_textovy_dokument.txt");
         Pattern pattern = Pattern.compile("\\d+\\.(.+)");
         try {
@@ -153,12 +141,11 @@ public class JdbcSongDAO {
            }
            add(name, stringBuilder.toString());
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    private void add(String desc, String text)
-    {
+    private void add(String desc, String text) throws SQLException {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement("INSERT INTO SONG VALUES (null,?,?)")) {
                 ps.setString(1, desc);
@@ -166,8 +153,6 @@ public class JdbcSongDAO {
                 ps.execute();
                 ps.close();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 }

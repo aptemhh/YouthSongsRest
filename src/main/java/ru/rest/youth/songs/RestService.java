@@ -14,7 +14,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 import java.io.*;
+import java.sql.SQLException;
 
 public class RestService {
 
@@ -29,7 +31,7 @@ public class RestService {
     @Path("/number/{id}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#id")
-    public String getSong(@PathParam("id") Integer id) {
+    public String getSong(@PathParam("id") Integer id) throws SQLException {
         return JsonConverter.convert(jdbcSongDAO.findBySongNumber(id));
     }
 
@@ -37,7 +39,7 @@ public class RestService {
     @Path("/find/{text}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#text")
-    public String findSongs(@PathParam("text") String text) {
+    public String findSongs(@PathParam("text") String text) throws SQLException {
         return JsonConverter.convert(jdbcSongDAO.getSongListShort(text));
     }
 
@@ -45,7 +47,7 @@ public class RestService {
     @Path("/find/")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee")
-    public String findSongs() {
+    public String findSongs() throws SQLException {
         return JsonConverter.convert(jdbcSongDAO.getSongListShort(null));
     }
 
@@ -79,7 +81,7 @@ public class RestService {
     @Path("/download")
     @Cacheable(value = "employee")
     @Produces(MediaType.TEXT_HTML+ ";charset=utf-8")
-    public Response downloadXml(@Context HttpServletResponse response) throws IOException {
+    public Response downloadXml(@Context HttpServletResponse response) throws IOException, JAXBException, SQLException {
         Response.ResponseBuilder builder = Response.ok();
         jdbcSongDAO.getXmlAllSongs(response.getOutputStream());
         builder.header("Content-Disposition", "attachment; filename=qwe.xml");
