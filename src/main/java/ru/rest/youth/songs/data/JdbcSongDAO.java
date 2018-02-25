@@ -49,8 +49,7 @@ public class JdbcSongDAO {
                 }
             }
         } catch (SQLException e) {
-            errorSong.setText(e.getMessage());
-            return errorSong;
+            e.printStackTrace();
         }
         return null;
     }
@@ -80,8 +79,7 @@ public class JdbcSongDAO {
             }
             return songList;
         } catch (SQLException e) {
-            errorSong.setText(e.getMessage());
-            return Collections.singletonList(errorSong);
+            throw new RuntimeException(e);
         }
     }
 
@@ -119,8 +117,7 @@ public class JdbcSongDAO {
                 }
                 return songList;
             } catch (SQLException e1) {
-                errorSong.setText(e1.getMessage());
-                return Collections.singletonList(errorSong);
+                throw new RuntimeException(e1);
             }
         }
     }
@@ -173,6 +170,4 @@ public class JdbcSongDAO {
             throw new RuntimeException(e);
         }
     }
-
-    private Song errorSong = new Song("Произошла ошибка","");
 }
