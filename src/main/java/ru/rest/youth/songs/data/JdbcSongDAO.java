@@ -78,8 +78,7 @@ public class JdbcSongDAO {
     public List<Song> getSongListShort(String text) throws SQLException {
         try {
             return Collections.singletonList(findBySongNumber(Integer.parseInt(text)));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             List<Song> songList = new ArrayList<>();
             try (Connection conn = dataSource.getConnection()) {
                 String sql;
@@ -119,27 +118,27 @@ public class JdbcSongDAO {
             Scanner scanner = new Scanner(file);
             StringBuilder stringBuilder = new StringBuilder();
             String name = "";
-            Boolean aBoolean=false;
-           for(; scanner.hasNextLine();) {
-               String s = scanner.nextLine();
-               if (pattern.matcher(s).matches()) {
-                   if (aBoolean) {
-                       add(name, stringBuilder.toString());
-                   }
+            Boolean aBoolean = false;
+            for (; scanner.hasNextLine(); ) {
+                String s = scanner.nextLine();
+                if (pattern.matcher(s).matches()) {
+                    if (aBoolean) {
+                        add(name, stringBuilder.toString());
+                    }
 
 
-                   stringBuilder = new StringBuilder();
-                   Matcher matcher = pattern.matcher(s);
-                   matcher.find();
-                   name = matcher.group(1);
-                   aBoolean = true;
-                   stringBuilder.append(name);
-                   continue;
-               }
-               stringBuilder.append("\n");
-               stringBuilder.append(s);
-           }
-           add(name, stringBuilder.toString());
+                    stringBuilder = new StringBuilder();
+                    Matcher matcher = pattern.matcher(s);
+                    matcher.find();
+                    name = matcher.group(1);
+                    aBoolean = true;
+                    stringBuilder.append(name);
+                    continue;
+                }
+                stringBuilder.append("\n");
+                stringBuilder.append(s);
+            }
+            add(name, stringBuilder.toString());
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }

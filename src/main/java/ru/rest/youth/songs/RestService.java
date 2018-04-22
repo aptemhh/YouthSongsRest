@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.rest.youth.songs.data.JdbcSongDAO;
 import ru.rest.youth.songs.data.Song;
+import ru.rest.youth.songs.data.StatisticDAO;
 import ru.rest.youth.songs.json.JsonConverter;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ public class RestService {
     private static ApplicationContext context =
             new ClassPathXmlApplicationContext("META-INF/spring/dao.xml");
     private static JdbcSongDAO jdbcSongDAO = (JdbcSongDAO) context.getBean("SongDAO");
+    private static StatisticDAO statisticDAO = (StatisticDAO) context.getBean("StatisticDAO");
 
     @Value("${uploadOnline}")
     private Boolean uploadOnline;
@@ -32,6 +34,7 @@ public class RestService {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#id")
     public String getSong(@PathParam("id") Integer id) throws SQLException {
+        statisticDAO.insert(id);
         return JsonConverter.convert(jdbcSongDAO.findBySongNumber(id));
     }
 

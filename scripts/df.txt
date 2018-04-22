@@ -8,3 +8,4 @@ database.url=jdbc:mysql://localhost:3306/u0463889_default?characterEncoding=UTF-
 cd apache-tomcat-7.0.84/bin
 JAVA_HOME=/var/www/u0463889/jdk1.8.0_161
 ./startup.sh
+./shutdown.sh
