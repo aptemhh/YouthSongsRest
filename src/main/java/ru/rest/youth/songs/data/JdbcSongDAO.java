@@ -146,12 +146,42 @@ public class JdbcSongDAO {
 
     private void add(String desc, String text) throws SQLException {
         try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO SONG VALUES (null,?,?)")) {
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO SONG VALUES (NULL,?,?)")) {
                 ps.setString(1, desc);
                 ps.setString(2, text);
                 ps.execute();
                 ps.close();
             }
+        }
+    }
+
+    public List<Song> getSongListShortByParty(String name) throws SQLException {
+        List<Song> songList = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "SELECT " +
+                    "p.SONG_ID ID, " +
+                    "s.DESCRIPTION " +
+                    "FROM PARTY_SONGS p " +
+                    "LEFT JOIN SONG s " +
+                    "ON p.SONG_ID = s.ID " +
+                    "WHERE PARTY_ID = " +
+                    "(SELECT id " +
+                    "FROM PARTY " +
+                    "WHERE name = ?) " +
+                    "ORDER BY  p.POSITION";
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, name);
+
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    for (; rs.next(); ) {
+                        songList.add(new Song(rs.getInt("ID"),
+                                rs.getString("DESCRIPTION")));
+                    }
+                }
+            }
+            return songList;
         }
     }
 }

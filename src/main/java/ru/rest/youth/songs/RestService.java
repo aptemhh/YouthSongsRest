@@ -83,11 +83,19 @@ public class RestService {
     @GET
     @Path("/download")
     @Cacheable(value = "employee")
-    @Produces(MediaType.TEXT_HTML+ ";charset=utf-8")
+    @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
     public Response downloadXml(@Context HttpServletResponse response) throws IOException, JAXBException, SQLException {
         Response.ResponseBuilder builder = Response.ok();
         jdbcSongDAO.getXmlAllSongs(response.getOutputStream());
         builder.header("Content-Disposition", "attachment; filename=qwe.xml");
         return builder.build();
+    }
+
+    @GET
+    @Path("/party/{name}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Cacheable(value = "employee")
+    public List<Song> findSongsByParty(@PathParam("name") String name) throws SQLException {
+        return jdbcSongDAO.getSongListShortByParty(name);
     }
 }
