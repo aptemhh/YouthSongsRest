@@ -20,6 +20,7 @@
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="ru.rest.youth.songs.filters.SimpleCORSFilter"/>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
 

@@ -8,7 +8,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.rest.youth.songs.data.JdbcSongDAO;
 import ru.rest.youth.songs.data.Song;
 import ru.rest.youth.songs.data.StatisticDAO;
-import ru.rest.youth.songs.json.JsonConverter;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
@@ -18,6 +17,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.sql.SQLException;
+import java.util.List;
 
 public class RestService {
 
@@ -33,25 +33,25 @@ public class RestService {
     @Path("/number/{id}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#id")
-    public String getSong(@PathParam("id") Integer id) throws SQLException {
+    public Song getSong(@PathParam("id") Integer id) throws SQLException {
         statisticDAO.insert(id);
-        return JsonConverter.convert(jdbcSongDAO.findBySongNumber(id));
+        return jdbcSongDAO.findBySongNumber(id);
     }
 
     @GET
     @Path("/find/{text}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#text")
-    public String findSongs(@PathParam("text") String text) throws SQLException {
-        return JsonConverter.convert(jdbcSongDAO.getSongListShort(text));
+    public List<Song> findSongs(@PathParam("text") String text) throws SQLException {
+        return jdbcSongDAO.getSongListShort(text);
     }
 
     @GET
     @Path("/find/")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee")
-    public String findSongs() throws SQLException {
-        return JsonConverter.convert(jdbcSongDAO.getSongListShort(null));
+    public List<Song> findSongs() throws SQLException {
+        return jdbcSongDAO.getSongListShort(null);
     }
 
 
