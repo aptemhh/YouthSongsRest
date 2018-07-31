@@ -10,7 +10,7 @@ public class StatisticDAO {
 
     private DataSource dataSource;
 
-    private static final String insertSql = "INSERT INTO statistic (number) VALUES (?)";
+    private static final String INSERT_SQL = "INSERT INTO statistic (number) VALUES (?)";
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -18,7 +18,7 @@ public class StatisticDAO {
 
     public void insert(Integer number) throws SQLException {
         try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+            try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
                 ps.setInt(1, number);
                 ps.execute();
             }

@@ -20,13 +20,14 @@ import java.util.regex.Pattern;
 
 public class JdbcSongDAO {
 
+    public static final String DESCRIPTION = "DESCRIPTION";
+    public static final String TEXT = "TEXT";
+    public static final String ID = "ID";
     private DataSource dataSource;
-    private static final String GET_SING_LIST = "SELECT ID,DESCRIPTION,TEXT " +
-            "FROM SONG " +
-            "ORDER BY ID";
-    private static final String GET_SING_LIST_SHORT = "SELECT ID,DESCRIPTION " +
-            "FROM SONG " +
-            "ORDER BY ID";
+    private static final String GET_SING_LIST =
+            "SELECT ID,DESCRIPTION,TEXT FROM SONG ORDER BY ID";
+    private static final String GET_SING_LIST_SHORT =
+            "SELECT ID,DESCRIPTION FROM SONG ORDER BY ID";
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -41,9 +42,9 @@ public class JdbcSongDAO {
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return new Song(
-                                rs.getInt("ID"),
-                                rs.getString("DESCRIPTION"),
-                                rs.getString("TEXT")
+                                rs.getInt(ID),
+                                rs.getString(DESCRIPTION),
+                                rs.getString(TEXT)
                         );
                     }
                 }
@@ -64,10 +65,10 @@ public class JdbcSongDAO {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(GET_SING_LIST)) {
                 try (ResultSet rs = ps.executeQuery()) {
-                    for (; rs.next(); ) {
-                        songList.add(new Song(rs.getInt("ID"),
-                                rs.getString("DESCRIPTION"),
-                                rs.getString("TEXT")));
+                    while (rs.next()) {
+                        songList.add(new Song(rs.getInt(ID),
+                                rs.getString(DESCRIPTION),
+                                rs.getString(TEXT)));
                     }
                 }
             }
@@ -99,9 +100,9 @@ public class JdbcSongDAO {
                     }
 
                     try (ResultSet rs = ps.executeQuery()) {
-                        for (; rs.next(); ) {
-                            songList.add(new Song(rs.getInt("ID"),
-                                    rs.getString("DESCRIPTION")));
+                        while (rs.next()) {
+                            songList.add(new Song(rs.getInt(ID),
+                                    rs.getString(DESCRIPTION)));
                         }
                     }
                 }
@@ -110,33 +111,40 @@ public class JdbcSongDAO {
         }
     }
 
+    /**
+     * Инициализация песен в базе
+     * @throws SQLException ошибка sql
+     */
     @Deprecated
     public void load() throws SQLException {
         File file = new File("E:\\Novy_textovy_dokument.txt");
         Pattern pattern = Pattern.compile("\\d+\\.(.+)");
         try {
-            Scanner scanner = new Scanner(file);
-            StringBuilder stringBuilder = new StringBuilder();
-            String name = "";
-            Boolean aBoolean = false;
-            for (; scanner.hasNextLine(); ) {
-                String s = scanner.nextLine();
-                if (pattern.matcher(s).matches()) {
-                    if (aBoolean) {
-                        add(name, stringBuilder.toString());
+            StringBuilder stringBuilder;
+            String name;
+            try (Scanner scanner = new Scanner(file)) {
+                stringBuilder = new StringBuilder();
+                name = "";
+                Boolean aBoolean = false;
+                while (scanner.hasNextLine()) {
+                    String s = scanner.nextLine();
+                    if (pattern.matcher(s).matches()) {
+                        if (aBoolean) {
+                            add(name, stringBuilder.toString());
+                        }
+
+
+                        stringBuilder = new StringBuilder();
+                        Matcher matcher = pattern.matcher(s);
+                        matcher.find();
+                        name = matcher.group(1);
+                        aBoolean = true;
+                        stringBuilder.append(name);
+                        continue;
                     }
-
-
-                    stringBuilder = new StringBuilder();
-                    Matcher matcher = pattern.matcher(s);
-                    matcher.find();
-                    name = matcher.group(1);
-                    aBoolean = true;
-                    stringBuilder.append(name);
-                    continue;
+                    stringBuilder.append("\n");
+                    stringBuilder.append(s);
                 }
-                stringBuilder.append("\n");
-                stringBuilder.append(s);
             }
             add(name, stringBuilder.toString());
         } catch (FileNotFoundException e) {
@@ -150,7 +158,6 @@ public class JdbcSongDAO {
                 ps.setString(1, desc);
                 ps.setString(2, text);
                 ps.execute();
-                ps.close();
             }
         }
     }
@@ -175,9 +182,9 @@ public class JdbcSongDAO {
 
 
                 try (ResultSet rs = ps.executeQuery()) {
-                    for (; rs.next(); ) {
-                        songList.add(new Song(rs.getInt("ID"),
-                                rs.getString("DESCRIPTION")));
+                    while (rs.next()) {
+                        songList.add(new Song(rs.getInt(ID),
+                                rs.getString(DESCRIPTION)));
                     }
                 }
             }
