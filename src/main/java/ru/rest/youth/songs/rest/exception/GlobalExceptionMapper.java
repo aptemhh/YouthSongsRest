@@ -1,8 +1,13 @@
-package ru.rest.youth.songs.exception;
+package ru.rest.youth.songs.rest.exception;
+
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
+@Provider
+@Component
 public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
 

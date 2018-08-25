@@ -1,4 +1,6 @@
-package ru.rest.youth.songs.data;
+package ru.rest.youth.songs;
+
+import ru.rest.youth.songs.data.Song;
 
 import javax.xml.bind.annotation.*;
 import java.util.List;

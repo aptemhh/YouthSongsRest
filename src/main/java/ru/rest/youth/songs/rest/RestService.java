@@ -1,14 +1,13 @@
-package ru.rest.youth.songs;
+package ru.rest.youth.songs.rest;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import ru.rest.youth.songs.data.JdbcSongDAO;
+import org.springframework.web.bind.annotation.*;
+import ru.rest.youth.songs.services.SongService;
 import ru.rest.youth.songs.data.Song;
-import ru.rest.youth.songs.data.StatisticDAO;
+import ru.rest.youth.songs.services.StatisticDAO;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -19,83 +18,80 @@ import java.io.*;
 import java.sql.SQLException;
 import java.util.List;
 
+@RestController
+@RequestMapping(path = "/rest")
 public class RestService {
 
-    private static ApplicationContext context =
-            new ClassPathXmlApplicationContext("META-INF/spring/dao.xml");
-    private static JdbcSongDAO jdbcSongDAO = (JdbcSongDAO) context.getBean("SongDAO");
-    private static StatisticDAO statisticDAO = (StatisticDAO) context.getBean("StatisticDAO");
+    @Resource
+    private SongService songService;
+    private static StatisticDAO statisticDAO = new StatisticDAO();
 
-    @Value("${uploadOnline}")
-    private Boolean uploadOnline;
+//    @Value("${uploadOnline}")
+//    private Boolean uploadOnline;
 
-    @GET
-    @Path("/number/{id}")
+    @RequestMapping(value = "/number/{id}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#id")
-    public Song getSong(@PathParam("id") Integer id) throws SQLException {
+    public Song getSong(@PathVariable("id") Long id) throws SQLException {
         statisticDAO.insert(id);
-        return jdbcSongDAO.findBySongNumber(id);
+        return songService.findBySongNumber(id);
     }
 
-    @GET
-    @Path("/find/{text}")
+
+    @RequestMapping(value = "/find/{text}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee", key = "#text")
-    public List<Song> findSongs(@PathParam("text") String text) throws SQLException {
-        return jdbcSongDAO.getSongListShort(text);
+    public List<Song> findSongs(@PathVariable("text") String text)
+    {
+        return songService.getSongListShort(text);
     }
 
-    @GET
-    @Path("/find/")
+    @RequestMapping(value = "/find")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee")
-    public List<Song> findSongs() throws SQLException {
-        return jdbcSongDAO.getSongListShort(null);
+    public List<Song> findSongs()
+    {
+        return songService.getSongListShort();
     }
 
 
-    @GET
-    @Path("/upload")
+    @RequestMapping(value = "/upload")
     @Produces(MediaType.TEXT_HTML)
     @CacheEvict(value = "employee")
     public Response uploadXml() {
-        if (uploadOnline) {
-
-        }
+//        if (uploadOnline) {
+//
+//        }
 
         return Response.ok().build();
     }
 
-    @GET
-    @Path("/upload")
+    @RequestMapping(value = "/upload1")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @CacheEvict(value = "employee")
     public Response upload(Song song) {
-        if (uploadOnline) {
-
-            //#TODO релизовать загрузку через xml файл
-        }
+//        if (uploadOnline) {
+//
+//            //#TODO релизовать загрузку через xml файл
+//        }
         return Response.ok().build();
     }
 
-    @GET
-    @Path("/download")
+    @RequestMapping(value = "/download")
     @Cacheable(value = "employee")
     @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
     public Response downloadXml(@Context HttpServletResponse response) throws IOException, JAXBException, SQLException {
         Response.ResponseBuilder builder = Response.ok();
-        jdbcSongDAO.getXmlAllSongs(response.getOutputStream());
+        songService.getXmlAllSongs(response.getOutputStream());
         builder.header("Content-Disposition", "attachment; filename=qwe.xml");
         return builder.build();
     }
 
-    @GET
-    @Path("/party/{name}")
+    @RequestMapping(value = "/party/{name}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Cacheable(value = "employee")
-    public List<Song> findSongsByParty(@PathParam("name") String name) throws SQLException {
-        return jdbcSongDAO.getSongListShortByParty(name);
+    public List<Song> findSongsByParty(@PathVariable("name") String name) throws SQLException {
+        return songService.getSongListShortByParty(name);
     }
 }
