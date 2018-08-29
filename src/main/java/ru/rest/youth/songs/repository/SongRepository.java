@@ -8,10 +8,11 @@ import java.util.List;
 
 public interface SongRepository extends CrudRepository<Song, Long>
 {
-    @Query("SELECT number,description FROM Song WHERE DESCRIPTION LIKE %?1% ORDER BY ID")
+    @Query(value = "SELECT s.ID, s.DESCRIPTION, null TEXT FROM SONG s WHERE " +
+            "s.DESCRIPTION LIKE %?1% OR s.TEXT LIKE %?1% ORDER BY s.ID" , nativeQuery = true)
     public List<Song> getAllSongShort(String text);
 
-    @Query("SELECT number,description FROM Song ORDER BY ID")
+    @Query(value = "SELECT s.ID, s.DESCRIPTION, null TEXT FROM SONG s ORDER BY s.ID" , nativeQuery = true)
     public List<Song> getAllSongShort();
 
     public List<Song> findAll();

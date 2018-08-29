@@ -1,5 +1,6 @@
 package ru.rest.youth.songs.rest;
 
+import com.mysql.jdbc.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -43,6 +45,10 @@ public class RestService {
     @Cacheable(value = "employee", key = "#text")
     public List<Song> findSongs(@PathVariable("text") String text)
     {
+        if (StringUtils.isStrictlyNumeric(text))
+        {
+            return Collections.singletonList(songService.findBySongNumber(Long.parseLong(text)));
+        }
         return songService.getSongListShort(text);
     }
 
@@ -80,8 +86,9 @@ public class RestService {
 
     @RequestMapping(value = "/download")
     @Cacheable(value = "employee")
-    @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
-    public Response downloadXml(@Context HttpServletResponse response) throws IOException, JAXBException, SQLException {
+    @Produces(MediaType.APPLICATION_XML)
+    public Response downloadXml(@Context HttpServletResponse response) throws IOException, JAXBException
+    {
         Response.ResponseBuilder builder = Response.ok();
         songService.getXmlAllSongs(response.getOutputStream());
         builder.header("Content-Disposition", "attachment; filename=qwe.xml");
@@ -89,9 +96,10 @@ public class RestService {
     }
 
     @RequestMapping(value = "/party/{name}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Produces(MediaType.APPLICATION_JSON)
     @Cacheable(value = "employee")
-    public List<Song> findSongsByParty(@PathVariable("name") String name) throws SQLException {
+    public List<Song> findSongsByParty(@PathVariable("name") String name)
+    {
         return songService.getSongListShortByParty(name);
     }
 }

@@ -23,22 +23,6 @@ public class Song {
     @Column(name = "TEXT")
     String text;
 
-    public Song(Long number, String description, String text) {
-        this.number = number;
-        this.description = description;
-        this.text = text;
-    }
-
-    public Song(Long number, String description) {
-        this.number = number;
-        this.description = description;
-    }
-
-    public Song(String description, String text) {
-        this.description = description;
-        this.text = text;
-    }
-
     public Song()
     {}
 
