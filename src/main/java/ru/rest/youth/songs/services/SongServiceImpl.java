@@ -10,7 +10,6 @@ import javax.servlet.ServletOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -107,33 +106,6 @@ public class SongServiceImpl implements SongService {
     @Override
     public List<Song> getSongListShortByParty(String name)
     {
-//        List<Song> songList = new ArrayList<>();
-//        try (Connection conn = dataSource.getConnection()) {
-//            String sql = "SELECT " +
-//                    "p.SONG_ID ID, " +
-//                    "s.DESCRIPTION " +
-//                    "FROM PARTY_SONGS p " +
-//                    "LEFT JOIN SONG s " +
-//                    "ON p.SONG_ID = s.ID " +
-//                    "WHERE PARTY_ID = " +
-//                    "(SELECT id " +
-//                    "FROM PARTY " +
-//                    "WHERE name = ?) " +
-//                    "ORDER BY  p.POSITION";
-//
-//            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-//                ps.setString(1, name);
-//
-//
-//                try (ResultSet rs = ps.executeQuery()) {
-//                    while (rs.next()) {
-//                        songList.add(new Song(rs.getInt(ID),
-//                                rs.getString(DESCRIPTION)));
-//                    }
-//                }
-//            }
-//            return songList;
-//        }
-        return new ArrayList<>();
+        return songRepository.getAllSongByParty(name);
     }
 }

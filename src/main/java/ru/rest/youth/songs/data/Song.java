@@ -1,5 +1,7 @@
 package ru.rest.youth.songs.data;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,15 +15,16 @@ public class Song {
 
     @Id
     @Column(name = "ID")
-    Long number;
+    private Long number;
 
     @XmlElement
     @Column(name = "DESCRIPTION")
-    String description;
+    private  String description;
 
     @XmlElement
     @Column(name = "TEXT")
-    String text;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  String text;
 
     public Song()
     {}
